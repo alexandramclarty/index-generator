@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quick Links Script Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0c2340;
+    --navy-deep: #081a30;
+    --blue: #2563eb;
+    --blue-light: #dbeafe;
+    --blue-pale: #eff6ff;
+    --green: #16a34a;
+    --red: #dc2626;
+    --red-light: #fee2e2;
+    --amber: #d97706;
+    --amber-light: #fef3c7;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+    --radius: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-800);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .header {
+    background: var(--navy);
+    color: white;
+    padding: 24px 0;
+    box-shadow: 0 2px 8px rgba(12,35,64,0.3);
+  }
+  .header-inner { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+  .header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+  .header p { font-size: 14px; opacity: 0.75; margin-top: 4px; }
+  .container { max-width: 800px; margin: 0 auto; padding: 32px 24px 64px; }
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-size: 15px; font-weight: 600; color: var(--gray-700);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .step {
+    background: var(--navy); color: white;
+    width: 24px; height: 24px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+  label { display: block; font-size: 13px; font-weight: 600; color: var(--gray-600); margin-bottom: 6px; }
+  label .hint { font-weight: 400; color: var(--gray-400); }
+  input[type="text"] {
+    width: 100%; padding: 10px 12px;
+    border: 1px solid var(--gray-300); border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--gray-800);
+    transition: border-color 0.15s, box-shadow 0.15s; outline: none;
+  }
+  input[type="text"]:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+  input::placeholder, textarea::placeholder { color: var(--gray-400); }
+  .input-prefix {
+    display: flex; align-items: stretch;
+    border: 1px solid var(--gray-300); border-radius: var(--radius);
+    overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .input-prefix:focus-within { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+  .input-prefix .prefix {
+    background: var(--gray-100); padding: 10px 12px;
+    font-size: 13px; font-family: 'JetBrains Mono', monospace;
+    color: var(--gray-500); white-space: nowrap;
+    border-right: 1px solid var(--gray-300); display: flex; align-items: center;
+  }
+  .input-prefix input {
+    border: none; border-radius: 0; flex: 1; padding: 10px 12px;
+    font-family: 'JetBrains Mono', monospace; font-size: 14px; outline: none;
+  }
+  textarea {
+    width: 100%; padding: 12px;
+    border: 1px solid var(--gray-300); border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--gray-800);
+    resize: vertical; line-height: 1.6;
+    transition: border-color 0.15s, box-shadow 0.15s; outline: none;
+  }
+  textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+  .field-group { margin-bottom: 16px; }
+  .field-group:last-child { margin-bottom: 0; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 24px; border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+    border: none; cursor: pointer; transition: all 0.15s;
+  }
+  .btn-primary { background: var(--blue); color: white; width: 100%; }
+  .btn-primary:hover { background: #1d4ed8; }
+  .btn-primary:active { transform: scale(0.99); }
+  .btn-copy { background: var(--navy); color: white; width: 100%; padding: 14px 24px; font-size: 15px; }
+  .btn-copy:hover { background: var(--navy-deep); }
+  .btn-copy.copied { background: var(--green); }
+  .output-wrap { display: none; }
+  .output-wrap.visible { display: block; }
+  .script-preview {
+    background: var(--gray-900); color: #e2e8f0;
+    border-radius: var(--radius); padding: 16px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.6;
+    max-height: 200px; overflow-y: auto; white-space: pre-wrap; word-break: break-all;
+    margin-bottom: 16px;
+  }
+  .parsed-list {
+    background: var(--blue-pale); border: 1px solid var(--blue-light);
+    border-radius: var(--radius); padding: 16px;
+  }
+  .parsed-list h4 { font-size: 13px; font-weight: 600; color: var(--blue); margin-bottom: 8px; }
+  .parsed-list ol { padding-left: 24px; font-size: 13px; color: var(--gray-700); }
+  .parsed-list li { padding: 3px 0; }
+  .parsed-list li .time {
+    color: var(--gray-400); font-size: 12px; font-family: 'JetBrains Mono', monospace;
+  }
+  .error-box {
+    background: var(--red-light); border: 1px solid #fca5a5;
+    border-radius: var(--radius); padding: 12px 16px;
+    font-size: 13px; color: var(--red); display: none; margin-bottom: 16px;
+  }
+  .error-box.visible { display: block; }
+  .instructions {
+    background: var(--gray-100); border-radius: var(--radius);
+    padding: 16px; margin-bottom: 20px;
+  }
+  .instructions summary { font-size: 14px; font-weight: 600; color: var(--gray-700); cursor: pointer; user-select: none; }
+  .instructions .steps { margin-top: 12px; font-size: 13px; color: var(--gray-600); line-height: 1.8; }
+  .instructions .steps strong { color: var(--gray-700); }
+  .instructions code {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    background: var(--gray-200); padding: 2px 6px; border-radius: 4px;
+  }
+  .format-hint {
+    background: var(--amber-light); border-radius: 6px;
+    padding: 10px 14px; font-size: 12px; color: var(--amber);
+    margin-top: 10px; line-height: 1.7; font-family: 'JetBrains Mono', monospace;
+  }
+  .format-hint strong {
+    font-family: 'DM Sans', sans-serif; font-size: 12px; display: block; margin-bottom: 2px;
+  }
+  @media (max-width: 600px) {
+    .field-row { grid-template-columns: 1fr; }
+    .input-prefix .prefix { font-size: 11px; padding: 10px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <h1>Quick Links Script Generator</h1>
+    <p>Generate browser console scripts to add video chapter indexes to CETL SharePoint pages</p>
+  </div>
+</div>
+
+<div class="container">
+
+  <details class="instructions">
+    <summary>How to use this tool</summary>
+    <div class="steps">
+      <strong>1.</strong> Fill in the page filename, video URL, and paste your chapter timestamps below.<br>
+      <strong>2.</strong> Click <strong>Generate Script</strong> and review the parsed chapters.<br>
+      <strong>3.</strong> Click <strong>Copy Script to Clipboard</strong>.<br>
+      <strong>4.</strong> Go to <strong>any page</strong> on the CETL SharePoint site in your browser.<br>
+      <strong>5.</strong> Press <code>F12</code> to open Developer Tools, click the <strong>Console</strong> tab.<br>
+      <strong>6.</strong> Paste the script and press <strong>Enter</strong>.<br>
+      <strong>7.</strong> Wait for the <strong>SUCCESS</strong> message, then refresh the target page to verify.<br>
+      <strong>8.</strong> The page is saved as a <strong>draft</strong> &mdash; review and publish when ready.
+    </div>
+  </details>
+
+  <div class="card">
+    <div class="card-title"><span class="step">1</span> Page Details</div>
+    <div class="field-row">
+      <div class="field-group">
+        <label>Page filename</label>
+        <div class="input-prefix">
+          <span class="prefix">sitepages/</span>
+          <input type="text" id="pageName" placeholder="my-webinar.aspx">
+        </div>
+      </div>
+      <div class="field-group">
+        <label>Web part title <span class="hint">(internal label, hidden from visitors)</span></label>
+        <input type="text" id="wpTitle" value="" placeholder="e.g. Balancing Act: Index">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="step">2</span> Video URL</div>
+    <div class="field-group">
+      <label>Base video URL <span class="hint">&mdash; the YuJa link without start/stop times</span></label>
+      <input type="text" id="videoUrl" placeholder="https://dcccd.yuja.com/V/Video?v=12345678&node=12345678&a=123456789">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="step">3</span> Chapter Timestamps</div>
+    <div class="field-group">
+      <label>Paste the chapter index</label>
+      <textarea id="chapterInput" rows="12" placeholder="0:00 &#8211; 1:35: Introduction
+1:36 &#8211; 7:40: Three Program Models
+7:41 &#8211; 13:44: The Impact of Dual Credit"></textarea>
+      <div class="format-hint">
+        <strong>Expected format (one chapter per line):</strong>
+        0:00 &ndash; 1:35: Introduction<br>
+        1:36 &ndash; 7:40: Three Program Models<br>
+        7:41 &ndash; 13:44: The Impact of Dual Credit
+      </div>
+    </div>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <button class="btn btn-primary" onclick="generate()">Generate Script</button>
+
+  <div class="output-wrap" id="outputWrap">
+    <div style="height: 24px;"></div>
+    <div class="card">
+      <div class="card-title"><span class="step">4</span> Review Parsed Chapters</div>
+      <div class="parsed-list" id="parsedList"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="step">5</span> Copy &amp; Run</div>
+      <div class="script-preview" id="scriptPreview"></div>
+      <button class="btn btn-copy" id="copyBtn" onclick="copyScript()">Copy Script to Clipboard</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var generatedScript = "";
+
+function timeToSeconds(t) {
+  var p = t.trim().split(":").map(Number);
+  if (p.some(isNaN)) return null;
+  if (p.length === 3) return p[0] * 3600 + p[1] * 60 + p[2];
+  if (p.length === 2) return p[0] * 60 + p[1];
+  return null;
+}
+
+function fmtTime(s) {
+  var m = Math.floor(s / 60), sec = s % 60;
+  return m + ":" + (sec < 10 ? "0" : "") + sec;
+}
+
+function parseTimestamps(raw) {
+  var lines = raw.split(/\n/).map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });
+  var chapters = [];
+  // Flexible pattern: start – end: title  (handles various dash types, optional colon before title)
+  var pat = /^(\d{1,2}:\d{2}(?::\d{2})?)\s*[\u2013\u2014\-\u2010\u2011\u2012\u2015\u00AD–—]+\s*(\d{1,2}:\d{2}(?::\d{2})?)\s*[:;\-\u2013\u2014–—]?\s*(.+)$/;
+
+  for (var i = 0; i < lines.length; i++) {
+    var m = lines[i].match(pat);
+    if (m) {
+      var s = timeToSeconds(m[1]), e = timeToSeconds(m[2]), title = m[3].trim();
+      if (s !== null && e !== null && title.length > 0) {
+        chapters.push({ startTime: s, stopTime: e, title: title });
+      }
+    }
+  }
+  if (chapters.length === 0) {
+    throw new Error("Could not parse any chapters.\n\nExpected format (one per line):\n0:00 \u2013 1:35: Introduction\n1:36 \u2013 7:40: Three Program Models");
+  }
+  return chapters;
+}
+
+function cleanUrl(url) {
+  return url.replace(/[&?](startTime|stopTime)=\d+/g, "").replace(/[&?]$/, "");
+}
+
+function esc(s) { return s.replace(/\\/g, "\\\\").replace(/"/g, '\\"'); }
+
+function buildScript(pageName, wpTitle, baseUrl, chapters) {
+  var cl = chapters.map(function(ch, i) {
+    var n = i + 1;
+    var u = baseUrl + "&startTime=" + ch.startTime + "&stopTime=" + ch.stopTime;
+    return '    { title: "' + esc(n + ". " + ch.title) + '", url: "' + u + '" }';
+  }).join(",\n");
+
+  // Build the script as an array of lines for readability
+  var s = [];
+  s.push("{");
+  s.push("  const CONFIG = {");
+  s.push('    siteUrl: "https://dcccd.sharepoint.com/sites/CETL",');
+  s.push('    pageName: "' + esc(pageName) + '",');
+  s.push('    webPartTitle: "' + esc(wpTitle) + '",');
+  s.push('    thumbnailUrl: "/sites/CETL/Site%20Graphics/Icons/Icon_Play_Blue_Simple.png",');
+  s.push("    thumbnailMeta: {");
+  s.push('      siteId: "045f58b9-7ba1-456f-a2e7-5ae1ebb4573d",');
+  s.push('      webId: "50078d03-361c-47ea-9384-4d12322b5d60",');
+  s.push('      listId: "{197DF7BE-CEAC-4457-8627-E894FBB0DC2B}",');
+  s.push('      uniqueId: "7709271b-d9f7-418c-b58e-5b4245f1f640"');
+  s.push("    }");
+  s.push("  };");
+  s.push("");
+  s.push("  const CHAPTERS = [");
+  s.push(cl);
+  s.push("  ];");
+  s.push("");
+  s.push("  function buildQL(chs, pos) {");
+  s.push("    var iid = crypto.randomUUID();");
+  s.push("    var spt = { title: CONFIG.webPartTitle };");
+  s.push("    var imgs = {};");
+  s.push('    var lnks = { baseUrl: "/sites/CETL" };');
+  s.push("    var meta = {};");
+  s.push("    var items = [];");
+  s.push("    chs.forEach(function(ch, i) {");
+  s.push('      spt["items[" + i + "].title"] = ch.title;');
+  s.push('      imgs["items[" + i + "].image.url"] = CONFIG.thumbnailUrl;');
+  s.push('      lnks["items[" + i + "].sourceItem.url"] = ch.url;');
+  s.push('      meta["items[" + i + "].image.url"] = {');
+  s.push("        siteid: CONFIG.thumbnailMeta.siteId, webid: CONFIG.thumbnailMeta.webId,");
+  s.push('        listid: CONFIG.thumbnailMeta.listId, uniqueid: CONFIG.thumbnailMeta.uniqueId, fixedwidth: "100"');
+  s.push("      };");
+  s.push("      items.push({");
+  s.push('        sourceItem: { itemType: 2, fileExtension: "", progId: "" },');
+  s.push('        thumbnailType: 1, id: i + 1, description: "",');
+  s.push("        image: { guids: {");
+  s.push("          listId: CONFIG.thumbnailMeta.listId, uniqueId: CONFIG.thumbnailMeta.uniqueId,");
+  s.push("          webId: CONFIG.thumbnailMeta.webId, siteId: CONFIG.thumbnailMeta.siteId");
+  s.push("        }, imageFit: 2 },");
+  s.push('        altText: "", rawPreviewImageMinCanvasWidth: 32767,');
+  s.push("        shouldOpenInNewTab: true");
+  s.push("      });");
+  s.push("    });");
+  s.push("    return {");
+  s.push("      position: pos, id: iid, controlType: 3,");
+  s.push("      isFromSectionTemplate: false, addedFromPersistedData: true,");
+  s.push('      webPartId: "c70391ea-0b10-4ee9-b2b4-006d3fcad0cd",');
+  s.push("      webPartData: {");
+  s.push('        id: "c70391ea-0b10-4ee9-b2b4-006d3fcad0cd", instanceId: iid,');
+  s.push('        title: "Quick links",');
+  s.push('        description: "Show a collection of links to content such as documents, images, videos, and more in a variety of layouts with options for icons, images, and audience targeting.",');
+  s.push("        audiences: [], hideOn: { mobile: false },");
+  s.push("        serverProcessedContent: {");
+  s.push("          htmlStrings: {}, searchablePlainTexts: spt, imageSources: imgs, links: lnks,");
+  s.push('          componentDependencies: { layoutComponentId: "706e33c8-af37-4e7b-9d22-6e5694d92a6f" },');
+  s.push("          customMetadata: meta");
+  s.push("        },");
+  s.push('        dataVersion: "2.4",');
+  s.push("        properties: {");
+  s.push('          items: items, isMigrated: true, layoutId: "CompactCard",');
+  s.push("          shouldShowThumbnail: true, hideWebPartWhenEmpty: true,");
+  s.push("          isTitleEnabled: false, imageWidth: 100,");
+  s.push("          buttonLayoutOptions: { showDescription: false, buttonTreatment: 2, iconPositionType: 2, textAlignmentVertical: 2, textAlignmentHorizontal: 2, linesOfText: 2 },");
+  s.push("          listLayoutOptions: { showDescription: false, showIcon: true },");
+  s.push("          waffleLayoutOptions: { iconSize: 1, onlyShowThumbnail: false },");
+  s.push('          showCardMotion: false, dataProviderId: "QuickLinks",');
+  s.push("          webId: CONFIG.thumbnailMeta.webId, siteId: CONFIG.thumbnailMeta.siteId,");
+  s.push("          imagePicker: CONFIG.thumbnailUrl");
+  s.push("        },");
+  s.push("        containsDynamicDataSource: false");
+  s.push("      }");
+  s.push("    };");
+  s.push("  }");
+  s.push("");
+  s.push("  async function main() {");
+  s.push("    try {");
+  s.push('      var fp = "/sites/CETL/sitepages/" + CONFIG.pageName;');
+  s.push('      console.log("Step 1/5: Getting request digest...");');
+  s.push('      var dr = await fetch(CONFIG.siteUrl + "/_api/contextinfo", {');
+  s.push('        method: "POST", headers: { "Accept": "application/json;odata=verbose" }');
+  s.push("      });");
+  s.push("      var dd = await dr.json();");
+  s.push("      var digest = dd.d.GetContextWebInformation.FormDigestValue;");
+  s.push('      console.log("  Done!");');
+  s.push("");
+  s.push('      console.log("Step 2/5: Checking out page...");');
+  s.push("      var cor = await fetch(CONFIG.siteUrl + \"/_api/web/getfilebyserverrelativeurl('\" + fp + \"')/checkout\", {");
+  s.push('        method: "POST",');
+  s.push('        headers: { "Accept": "application/json;odata=verbose", "X-RequestDigest": digest }');
+  s.push("      });");
+  s.push("      if (!cor.ok) {");
+  s.push("        var ce = await cor.text();");
+  s.push('        if (ce.indexOf("checked out") > -1) { console.log("  Already checked out - continuing"); }');
+  s.push('        else { console.error("  Checkout failed: " + ce); return; }');
+  s.push('      } else { console.log("  Done!"); }');
+  s.push("");
+  s.push('      console.log("Step 3/5: Fetching page...");');
+  s.push("      var pr = await fetch(");
+  s.push("        CONFIG.siteUrl + \"/_api/sitepages/pages/GetByUrl('sitepages/\" + CONFIG.pageName + \"')?$select=Id,CanvasContent1\",");
+  s.push('        { headers: { "Accept": "application/json;odata=verbose" } }');
+  s.push("      );");
+  s.push("      var pd = await pr.json();");
+  s.push("      var pageId = pd.d.Id;");
+  s.push('      console.log("  Found page ID: " + pageId);');
+  s.push("");
+  s.push('      console.log("Step 4/5: Building Quick Links with " + CHAPTERS.length + " chapters...");');
+  s.push("      var canvas = JSON.parse(pd.d.CanvasContent1);");
+  s.push('      console.log("  Page currently has " + canvas.length + " controls");');
+  s.push("");
+  s.push('      var qlId = "c70391ea-0b10-4ee9-b2b4-006d3fcad0cd";');
+  s.push("      var ei = canvas.findIndex(function(c) {");
+  s.push("        if (!c.webPartData || c.webPartData.id !== qlId) return false;");
+  s.push("        var spt = c.webPartData.serverProcessedContent;");
+  s.push("        var t = spt && spt.searchablePlainTexts && spt.searchablePlainTexts.title;");
+  s.push('        return t === CONFIG.webPartTitle;');
+  s.push("      });");
+  s.push("      var position;");
+  s.push("      if (ei !== -1) {");
+  s.push("        position = canvas[ei].position;");
+  s.push("        canvas.splice(ei, 1);");
+  s.push('        console.log("  Replacing existing Quick Links web part");');
+  s.push("      } else {");
+  s.push("        var zz = canvas.filter(function(c) { return c.position; }).map(function(c) { return c.position.zoneIndex; });");
+  s.push("        var mz = Math.max.apply(null, zz);");
+  s.push("        position = { layoutIndex: 1, zoneIndex: mz + 1, sectionIndex: 1, sectionFactor: 12, controlIndex: 1 };");
+  s.push('        console.log("  No existing Quick Links - adding new section");');
+  s.push("      }");
+  s.push("");
+  s.push("      var ql = buildQL(CHAPTERS, position);");
+  s.push("      var si = canvas.findIndex(function(c) { return c.controlType === 0; });");
+  s.push("      if (si !== -1) { canvas.splice(si, 0, ql); } else { canvas.push(ql); }");
+  s.push("");
+  s.push('      console.log("Step 5/5: Saving page as draft...");');
+  s.push("      var sr = await fetch(");
+  s.push('        CONFIG.siteUrl + "/_api/sitepages/pages(" + pageId + ")/SavePageAsDraft",');
+  s.push("        {");
+  s.push('          method: "POST",');
+  s.push("          headers: {");
+  s.push('            "Accept": "application/json;odata=verbose",');
+  s.push('            "Content-Type": "application/json;odata=verbose",');
+  s.push('            "X-RequestDigest": digest');
+  s.push("          },");
+  s.push("          body: JSON.stringify({ CanvasContent1: JSON.stringify(canvas) })");
+  s.push("        }");
+  s.push("      );");
+  s.push("");
+  s.push("      if (sr.ok) {");
+  s.push('        console.log("");');
+  s.push('        console.log("SUCCESS! Quick Links with " + CHAPTERS.length + " chapters saved as draft to " + CONFIG.pageName);');
+  s.push('        console.log("Refresh the target page to preview, then publish when ready.");');
+  s.push("      } else {");
+  s.push("        var et = await sr.text();");
+  s.push('        console.error("Save failed (" + sr.status + "): " + et);');
+  s.push("      }");
+  s.push("    } catch (err) {");
+  s.push('      console.error("Error:", err);');
+  s.push("    }");
+  s.push("  }");
+  s.push("");
+  s.push("  main();");
+  s.push("}");
+
+  return s.join("\n");
+}
+
+function generate() {
+  var errorBox = document.getElementById("errorBox");
+  var outputWrap = document.getElementById("outputWrap");
+  errorBox.className = "error-box";
+  outputWrap.className = "output-wrap";
+
+  var pageName = document.getElementById("pageName").value.trim();
+  var wpTitle = document.getElementById("wpTitle").value.trim();
+  var videoUrl = document.getElementById("videoUrl").value.trim();
+  var chapterRaw = document.getElementById("chapterInput").value.trim();
+
+  if (!pageName) { showError("Please enter a page filename."); return; }
+  if (!pageName.endsWith(".aspx")) { showError('Page filename should end with ".aspx" (e.g., my-webinar.aspx).'); return; }
+  if (!wpTitle) { showError("Please enter a web part title."); return; }
+  if (!videoUrl) { showError("Please enter the base video URL."); return; }
+  if (!videoUrl.includes("http")) { showError("That doesn't look like a valid video URL. It should start with https://"); return; }
+  if (!chapterRaw) { showError("Please paste your chapter timestamps."); return; }
+
+  try {
+    var baseUrl = cleanUrl(videoUrl);
+    var chapters = parseTimestamps(chapterRaw);
+
+    var parsedList = document.getElementById("parsedList");
+    var html = "<h4>" + chapters.length + " chapters parsed</h4><ol>";
+    chapters.forEach(function(ch, i) {
+      html += "<li><strong>" + escapeHtml(ch.title) + "</strong> ";
+      html += '<span class="time">' + fmtTime(ch.startTime) + " \u2013 " + fmtTime(ch.stopTime) + "</span></li>";
+    });
+    html += "</ol>";
+    parsedList.innerHTML = html;
+
+    generatedScript = buildScript(pageName, wpTitle, baseUrl, chapters);
+    document.getElementById("scriptPreview").textContent =
+      generatedScript.substring(0, 600) + "\n\n... (" + generatedScript.length.toLocaleString() + " characters total)";
+
+    outputWrap.className = "output-wrap visible";
+    outputWrap.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    var copyBtn = document.getElementById("copyBtn");
+    copyBtn.textContent = "Copy Script to Clipboard";
+    copyBtn.className = "btn btn-copy";
+  } catch (err) {
+    showError(err.message);
+  }
+}
+
+function copyScript() {
+  navigator.clipboard.writeText(generatedScript).then(function() {
+    var btn = document.getElementById("copyBtn");
+    btn.textContent = "Copied!";
+    btn.className = "btn btn-copy copied";
+    setTimeout(function() {
+      btn.textContent = "Copy Script to Clipboard";
+      btn.className = "btn btn-copy";
+    }, 2500);
+  });
+}
+
+function showError(msg) {
+  var el = document.getElementById("errorBox");
+  el.textContent = msg;
+  el.className = "error-box visible";
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+</script>
+</body>
+</html>
