@@ -400,11 +400,12 @@ function buildScript(pageName, wpTitle, baseUrl, chapters) {
   s.push("");
   s.push('      console.log("Step 3/5: Fetching page...");');
   s.push("      var pr = await fetch(");
-  s.push("        CONFIG.siteUrl + \"/_api/sitepages/pages/GetByUrl('sitepages/\" + CONFIG.pageName + \"')?$select=Id,CanvasContent1\",");
+  s.push("        CONFIG.siteUrl + \"/_api/sitepages/pages/GetByUrl('sitepages/\" + CONFIG.pageName + \"')?$select=Id,CanvasContent1,BannerImageUrl\",");
   s.push('        { headers: { "Accept": "application/json;odata=verbose" } }');
   s.push("      );");
   s.push("      var pd = await pr.json();");
   s.push("      var pageId = pd.d.Id;");
+  s.push("      var bannerUrl = pd.d.BannerImageUrl;");
   s.push('      console.log("  Found page ID: " + pageId);');
   s.push("");
   s.push('      console.log("Step 4/5: Building Quick Links with " + CHAPTERS.length + " chapters...");');
@@ -448,7 +449,7 @@ function buildScript(pageName, wpTitle, baseUrl, chapters) {
   s.push('            "Content-Type": "application/json;odata=verbose",');
   s.push('            "X-RequestDigest": digest');
   s.push("          },");
-  s.push("          body: JSON.stringify({ CanvasContent1: JSON.stringify(canvas) })");
+  s.push("          body: JSON.stringify({ CanvasContent1: JSON.stringify(canvas), BannerImageUrl: bannerUrl })");
   s.push("        }");
   s.push("      );");
   s.push("");
