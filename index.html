@@ -431,8 +431,12 @@ function buildScript(pageName, wpTitle, baseUrl, chapters) {
   s.push("      }");
   s.push("");
   s.push("      var ql = buildQL(CHAPTERS, position);");
-  s.push("      var si = canvas.findIndex(function(c) { return c.controlType === 0; });");
-  s.push("      if (si !== -1) { canvas.splice(si, 0, ql); } else { canvas.push(ql); }");
+  s.push("      if (ei !== -1) {");
+  s.push("        canvas.splice(ei, 0, ql);");
+  s.push("      } else {");
+  s.push("        var si = canvas.findIndex(function(c) { return c.controlType === 0; });");
+  s.push("        if (si !== -1) { canvas.splice(si, 0, ql); } else { canvas.push(ql); }");
+  s.push("      }");
   s.push("");
   s.push('      console.log("Step 5/5: Saving page as draft...");');
   s.push("      var sr = await fetch(");
