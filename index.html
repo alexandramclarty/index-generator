@@ -226,7 +226,9 @@
         <strong>Expected format (one chapter per line):</strong>
         0:00 &ndash; 1:35: Introduction<br>
         1:36 &ndash; 7:40: Three Program Models<br>
-        7:41 &ndash; 13:44: The Impact of Dual Credit
+        7:41 &ndash; 13:44: The Impact of Dual Credit<br>
+        <strong style="margin-top: 6px;">Half-seconds: use a decimal point</strong>
+        0:36.5 &ndash; 1:43: Art and Science
       </div>
     </div>
   </div>
@@ -255,9 +257,12 @@ var generatedScript = "";
 function timeToSeconds(t) {
   var p = t.trim().split(":").map(Number);
   if (p.some(isNaN)) return null;
-  if (p.length === 3) return p[0] * 3600 + p[1] * 60 + p[2];
-  if (p.length === 2) return p[0] * 60 + p[1];
-  return null;
+  var total;
+  if (p.length === 3) total = p[0] * 3600 + p[1] * 60 + p[2];
+  else if (p.length === 2) total = p[0] * 60 + p[1];
+  else return null;
+  // Round to 3 decimals to avoid floating-point artifacts (e.g. 36.5 stays 36.5)
+  return Math.round(total * 1000) / 1000;
 }
 
 function fmtTime(s) {
@@ -268,8 +273,9 @@ function fmtTime(s) {
 function parseTimestamps(raw) {
   var lines = raw.split(/\n/).map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });
   var chapters = [];
-  // Flexible pattern: start – end: title  (handles various dash types, optional colon before title)
-  var pat = /^(\d{1,2}:\d{2}(?::\d{2})?)\s*[\u2013\u2014\-\u2010\u2011\u2012\u2015\u00AD–—]+\s*(\d{1,2}:\d{2}(?::\d{2})?)\s*[:;\-\u2013\u2014–—]?\s*(.+)$/;
+  // Flexible pattern: start – end: title  (handles various dash types, optional colon before title,
+  // and optional decimal seconds like 0:36.5)
+  var pat = /^(\d{1,2}:\d{2}(?::\d{2})?(?:\.\d+)?)\s*[\u2013\u2014\-\u2010\u2011\u2012\u2015\u00AD–—]+\s*(\d{1,2}:\d{2}(?::\d{2})?(?:\.\d+)?)\s*[:;\-\u2013\u2014–—]?\s*(.+)$/;
 
   for (var i = 0; i < lines.length; i++) {
     var m = lines[i].match(pat);
@@ -287,7 +293,7 @@ function parseTimestamps(raw) {
 }
 
 function cleanUrl(url) {
-  return url.replace(/[&?](startTime|stopTime)=\d+/g, "").replace(/[&?]$/, "");
+  return url.replace(/[&?](startTime|stopTime)=[\d.]+/g, "").replace(/[&?]$/, "");
 }
 
 function esc(s) { return s.replace(/\\/g, "\\\\").replace(/"/g, '\\"'); }
